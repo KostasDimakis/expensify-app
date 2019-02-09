@@ -1,23 +1,29 @@
-import uuid from 'uuid';
+import {fs} from '../firebase/firebase';
 
 // ADD_EXPENSE
-export const addExpense = (
-    {
+export const addExpense = expense => ({
+  type: 'ADD_EXPENSE',
+  expense,
+});
+
+export const startAddExpense = (expenseData = {}) => {
+  return dispatch => {
+    const {
       description = '',
       note = '',
       amount = 0,
       createdAt = 0,
-    } = {},
-) => ({
-  type: 'ADD_EXPENSE',
-  expense: {
-    id: uuid(),
-    description,
-    note,
-    amount,
-    createdAt,
-  },
-});
+    } = expenseData;
+
+    const expense = {description, note, amount, createdAt};
+    return fs.collection('expenses').add(expense).then(docRef => {
+      dispatch(addExpense({
+        id: docRef.id,
+        ...expense,
+      }));
+    });
+  };
+};
 
 // REMOVE_EXPENSE
 export const removeExpense = ({id} = {}) => ({
