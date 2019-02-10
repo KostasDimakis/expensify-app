@@ -58,3 +58,11 @@ export const startSetExpenses = () => {
     });
   };
 };
+
+export const startRemoveExpense = ({id}) => {
+  return dispatch => {
+    return fs.collection('expenses').doc(id).delete().then(() => {
+      dispatch(removeExpense({id}));
+    });
+  };
+};

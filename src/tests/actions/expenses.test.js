@@ -4,6 +4,7 @@ import {
   removeExpense,
   setExpenses,
   startAddExpense,
+  startRemoveExpense,
   startSetExpenses,
 } from '../../actions/expenses';
 import configureMockStore from 'redux-mock-store';
@@ -24,7 +25,7 @@ beforeEach(async function(done) {
 
   // populate new expenses
   expenses.forEach(({id, ...data}) => {
-    promises.push(fs.collection('expenses').add(data));
+    promises.push(fs.collection('expenses').doc(id).set(data));
   });
   await Promise.all(promises);
   done();
@@ -122,5 +123,21 @@ it('should set expenses from the database to the store', async function(done) {
     type: 'SET_EXPENSES',
     expenses: serverExpenses,
   });
+  done();
+});
+
+it('should remove expenses from the database and the store', async (done) => {
+  const store = createMockStore({});
+
+  await store.dispatch(startRemoveExpense({id: expenses[0].id}));
+  const actions = store.getActions();
+  expect(actions[0]).toEqual({
+    type: 'REMOVE_EXPENSE',
+    id: expenses[0].id,
+  });
+  const data = await fs.collection('expenses').
+      doc(expenses[0].id).
+      get().then(value => value.data());
+  expect(data).toBeUndefined();
   done();
 });
