@@ -4,6 +4,7 @@ import {
   removeExpense,
   setExpenses,
   startAddExpense,
+  startEditExpense,
   startRemoveExpense,
   startSetExpenses,
 } from '../../actions/expenses';
@@ -139,5 +140,21 @@ it('should remove expenses from the database and the store', async (done) => {
       doc(expenses[0].id).
       get().then(value => value.data());
   expect(data).toBeUndefined();
+  done();
+});
+
+it('should edit expenses in the database and the store', async (done) => {
+  const store = createMockStore({});
+  const updates = {description: 'Weapon'};
+  await store.dispatch(startEditExpense(expenses[0].id, updates));
+  const actions = store.getActions();
+  expect(actions[0]).toEqual({
+    type: 'EDIT_EXPENSE',
+    id: expenses[0].id,
+    updates,
+  });
+  const ref = await fs.collection('expenses').doc(expenses[0].id).get();
+  const {description} = ref.data();
+  expect(description).toBe('Weapon');
   done();
 });

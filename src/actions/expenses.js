@@ -66,3 +66,9 @@ export const startRemoveExpense = ({id}) => {
     });
   };
 };
+
+export const startEditExpense = (id, updates) => dispatch => {
+  return fs.collection('expenses').doc(id).update(updates).then(() => {
+    dispatch(editExpense(id, updates));
+  });
+};
