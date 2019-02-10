@@ -155,6 +155,6 @@ it('should edit expenses in the database and the store', async (done) => {
   });
   const ref = await fs.collection('expenses').doc(expenses[0].id).get();
   const {description} = ref.data();
-  expect(description).toBe('Weapon');
+  expect(description).toBe(updates.description);
   done();
 });
