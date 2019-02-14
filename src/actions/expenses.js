@@ -7,7 +7,7 @@ export const addExpense = expense => ({
 });
 
 export const startAddExpense = (expenseData = {}) => {
-  return dispatch => {
+  return (dispatch, getState) => {
     const {
       description = '',
       note = '',
@@ -16,7 +16,11 @@ export const startAddExpense = (expenseData = {}) => {
     } = expenseData;
 
     const expense = {description, note, amount, createdAt};
-    return fs.collection('expenses').add(expense).then(docRef => {
+    return fs.collection('users').
+        doc(getState().auth.uid).
+        collection('expenses').
+        add(expense).
+        then(docRef => {
       dispatch(addExpense({
         id: docRef.id,
         ...expense,
@@ -45,8 +49,12 @@ export const setExpenses = expenses => ({
 });
 
 export const startSetExpenses = () => {
-  return dispatch => {
-    return fs.collection('expenses').get().then(expensesRef => {
+  return (dispatch, getState) => {
+    return fs.collection('users').
+        doc(getState().auth.uid).
+        collection('expenses').
+        get().
+        then(expensesRef => {
       const expenses = [];
       expensesRef.forEach(doc => {
         expenses.push({
@@ -60,15 +68,25 @@ export const startSetExpenses = () => {
 };
 
 export const startRemoveExpense = ({id}) => {
-  return dispatch => {
-    return fs.collection('expenses').doc(id).delete().then(() => {
+  return (dispatch, getState) => {
+    return fs.collection('users').
+        doc(getState().auth.uid).
+        collection('expenses').
+        doc(id).
+        delete().
+        then(() => {
       dispatch(removeExpense({id}));
     });
   };
 };
 
-export const startEditExpense = (id, updates) => dispatch => {
-  return fs.collection('expenses').doc(id).update(updates).then(() => {
+export const startEditExpense = (id, updates) => (dispatch, getState) => {
+  return fs.collection('users').
+      doc(getState().auth.uid).
+      collection('expenses').
+      doc(id).
+      update(updates).
+      then(() => {
     dispatch(editExpense(id, updates));
   });
 };
