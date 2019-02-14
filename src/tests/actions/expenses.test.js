@@ -14,6 +14,7 @@ import thunk from 'redux-thunk';
 import {fs} from '../../firebase/firebase';
 
 const uid = 'thisismytestuid';
+const defaultAuthState = {auth: {uid}};
 
 // test db with data
 beforeEach(async function(done) {
@@ -71,7 +72,7 @@ test('should setup add expense action object with provided values', () => {
 });
 
 it('should add expense to database and store', async function(done) {
-  const store = createMockStore({auth: {uid}});
+  const store = createMockStore(defaultAuthState);
   const {id, ...expenseData} = expenses[2];
   await store.dispatch(startAddExpense(expenseData));
   const actions = store.getActions();
@@ -92,7 +93,7 @@ it('should add expense to database and store', async function(done) {
 });
 
 it('should add expense defaults to database and store', async function(done) {
-  const store = createMockStore({auth: {uid}});
+  const store = createMockStore(defaultAuthState);
   const expenseDefaults = {
     description: '',
     note: '',
@@ -126,7 +127,7 @@ it('should setup setExpenses action object', function() {
 });
 
 it('should set expenses from the database to the store', async function(done) {
-  const store = createMockStore({auth: {uid}});
+  const store = createMockStore(defaultAuthState);
   // get data from firestore
   const expensesRef = await fs.collection('users').
       doc(uid).
@@ -148,7 +149,7 @@ it('should set expenses from the database to the store', async function(done) {
 });
 
 it('should remove expenses from the database and the store', async (done) => {
-  const store = createMockStore({auth: {uid}});
+  const store = createMockStore(defaultAuthState);
 
   await store.dispatch(startRemoveExpense({id: expenses[0].id}));
   const actions = store.getActions();
@@ -165,7 +166,7 @@ it('should remove expenses from the database and the store', async (done) => {
 });
 
 it('should edit expenses in the database and the store', async (done) => {
-  const store = createMockStore({auth: {uid}});
+  const store = createMockStore(defaultAuthState);
   const updates = {description: 'Weapon'};
   await store.dispatch(startEditExpense(expenses[0].id, updates));
   const actions = store.getActions();
