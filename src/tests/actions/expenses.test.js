@@ -13,9 +13,14 @@ import expenses from '../fixtures/expenses';
 import thunk from 'redux-thunk';
 import {fs} from '../../firebase/firebase';
 
+const uid = 'thisismytestuid';
+
 // test db with data
 beforeEach(async function(done) {
-  const querySnapshot = await fs.collection('expenses').get();
+  const querySnapshot = await fs.collection('users').
+      doc(uid).
+      collection('expenses').
+      get();
   const promises = [];
 
   // clear expenses from db
@@ -26,7 +31,11 @@ beforeEach(async function(done) {
 
   // populate new expenses
   expenses.forEach(({id, ...data}) => {
-    promises.push(fs.collection('expenses').doc(id).set(data));
+    promises.push(fs.collection('users').
+        doc(uid).
+        collection('expenses').
+        doc(id).
+        set(data));
   });
   await Promise.all(promises);
   done();
@@ -73,7 +82,11 @@ it('should add expense to database and store', async function(done) {
       ...expenseData,
     },
   });
-  const doc = await fs.collection('expenses').doc(actions[0].expense.id).get();
+  const doc = await fs.collection('users').
+      doc(uid).
+      collection('expenses').
+      doc(actions[0].expense.id).
+      get();
   expect(doc.data()).toEqual(expenseData);
   done();
 });
@@ -95,7 +108,11 @@ it('should add expense defaults to database and store', async function(done) {
       ...expenseDefaults,
     },
   });
-  const doc = await fs.collection('expenses').doc(actions[0].expense.id).get();
+  const doc = await fs.collection('users').
+      doc(uid).
+      collection('expenses').
+      doc(actions[0].expense.id).
+      get();
   expect(doc.data()).toEqual(expenseDefaults);
   done();
 });
@@ -111,7 +128,10 @@ it('should setup setExpenses action object', function() {
 it('should set expenses from the database to the store', async function(done) {
   const store = createMockStore({});
   // get data from firestore
-  const expensesRef = await fs.collection('expenses').get();
+  const expensesRef = await fs.collection('users').
+      doc(uid).
+      collection('expenses').
+      get();
   const serverExpenses = [];
   expensesRef.forEach(doc => serverExpenses.push({
     id: doc.id,
@@ -136,7 +156,8 @@ it('should remove expenses from the database and the store', async (done) => {
     type: 'REMOVE_EXPENSE',
     id: expenses[0].id,
   });
-  const data = await fs.collection('expenses').
+  const data = await fs.collection('users').
+      doc(uid).collection('expenses').
       doc(expenses[0].id).
       get().then(value => value.data());
   expect(data).toBeUndefined();
@@ -153,7 +174,11 @@ it('should edit expenses in the database and the store', async (done) => {
     id: expenses[0].id,
     updates,
   });
-  const ref = await fs.collection('expenses').doc(expenses[0].id).get();
+  const ref = await fs.collection('users').
+      doc(uid).
+      collection('expenses').
+      doc(expenses[0].id).
+      get();
   const {description} = ref.data();
   expect(description).toBe(updates.description);
   done();
