@@ -2,6 +2,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {DateRangePicker} from 'react-dates';
 import {
+  setEndDate,
   setStartDate,
   setTextFilter,
   sortByAmount,
@@ -72,7 +73,7 @@ const mapDispatchToProps = dispatch => {
     sortByDate: () => dispatch(sortByDate()),
     sortByAmount: () => dispatch(sortByAmount()),
     setStartDate: (startDate) => dispatch(setStartDate(startDate)),
-    setEndDate: (endDate) => dispatch(setStartDate(endDate)),
+    setEndDate: (endDate) => dispatch(setEndDate(endDate)),
   };
 };
 
